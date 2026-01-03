@@ -1,67 +1,130 @@
 # Voice-to-Text Desktop App (Tauri + Deepgram)
 
-A high-performance, cross-platform desktop application that provides real-time voice transcription using the Deepgram API and Tauri framework.
+A high-performance, cross-platform desktop application that provides **real-time voice transcription** using the **Deepgram API** and **Tauri framework**. This project demonstrates a clean separation of concerns, native desktop integration, and low-latency audio streaming.
+
+---
 
 ## 🚀 Features
-- **Real-time Transcription:** Streams audio to Deepgram's Nova-2 model for instant text generation.
-- **Toggle Recording:** Simple Start/Stop control for ease of use.
-- **Editable Output:** Transcribed text appears in an interactive editor for immediate corrections.
-- **Visual Feedback:** Clear status indicators (Listening, Processing, Error) and visual cues when recording.
+
+- **Real-time Transcription**  
+  Streams microphone audio to Deepgram’s **Nova-2** speech model using a WebSocket connection for instant transcription.
+
+- **Chat-Style Workflow**  
+  A **Start / Stop** recording toggle saves completed transcriptions into a history log, enabling organized dictation sessions.
+
+- **Editable Output**  
+  Live transcription appears in an editable text area so users can correct or refine text immediately.
+
+- **Visual Feedback**  
+  Clear status indicators for:
+  - Listening  
+  - Processing  
+  - Error  
+  along with active-state UI styling.
+
+- **Cross-Platform Desktop App**  
+  Built with **Tauri**, producing a lightweight native application for **Windows, macOS, and Linux**.
+
+---
 
 ## 🛠 Tech Stack
-- **Framework:** [Tauri](https://tauri.app/) (Rust + WebView) for a lightweight, native desktop experience.
-- **Frontend:** React (Vite) for a responsive component-based UI.
-- **Speech Engine:** [Deepgram API](https://deepgram.com/) via WebSocket for low-latency streaming.
+
+- **Framework:** [Tauri](https://tauri.app/)  
+  Lightweight native desktop framework using Rust + WebView.
+
+- **Frontend:** React + Vite  
+  Fast development, component-based UI, and clean state handling.
+
+- **Speech-to-Text Engine:** [Deepgram API](https://deepgram.com/)  
+  Chosen for low latency, high accuracy, and real-time WebSocket streaming.
+
+---
 
 ## 🏗 Architecture & Design Decisions
 
-### 1. Separation of Concerns (Logic vs. UI)
-To ensure clean and maintainable code, the application logic is separated from the visual layer:
-- **`useVoiceToText.js` (Custom Hook):** Handles the "dirty work" — microphone permissions, WebSocket connections, and stream management.
-- **`App.jsx` (UI Layer):** Handles only the display and user interactions.
-*Why?* This makes the code easier to test and allows the speech engine to be swapped out in the future without breaking the UI.
+### 1. Separation of Concerns (Logic vs UI)
 
-### 2. WebSocket Implementation
-Instead of using the heavy Deepgram SDK for the frontend, I utilized native browser `WebSocket` API.
-*Why?* This reduces the bundle size significantly and offers finer control over the connection state (Open/Close/Error) directly within the React lifecycle.
+The application strictly separates **business logic** from **presentation**:
 
-### 3. Toggle vs. Push-to-Talk
-While Push-to-Talk was the initial prompt, I implemented a **Toggle (Start/Stop)** mechanism.
-*Why?* For longer dictations, holding a button is physically straining. A toggle allows the user to speak freely and edit text simultaneously, improving the workflow.
+- **`useVoiceToText.js` (Custom React Hook)**  
+  - Handles microphone access  
+  - Manages WebSocket lifecycle  
+  - Streams audio data  
+  - Processes incoming transcription events  
+
+- **`App.jsx` (UI Layer)**  
+  - Renders buttons, text areas, and status indicators  
+  - Consumes state exposed by the custom hook  
+  - Contains no business logic  
+
+This approach improves:
+- Readability  
+- Testability  
+- Maintainability  
+
+---
+
+### 2. Native WebSocket Implementation
+
+Instead of using the Deepgram frontend SDK, the app uses a **native WebSocket connection**:
+
+- Reduces bundle size  
+- Improves control over connection states  
+- Avoids unnecessary abstractions  
+
+---
+
+### 3. Security & Configuration
+
+- API keys are stored in **environment variables**
+- No secrets are hardcoded
+- `.env` file is excluded from version control
+
+---
 
 ## ⚙️ Setup & Installation
 
-**Prerequisites:**
-- Node.js (v18+)
-- Rust (latest stable)
-- Visual Studio C++ Build Tools (Windows)
+### Prerequisites
 
-**Steps:**
-1. Clone the repository:
-   ```bash
-   git clone <your-repo-url>
-   cd voice-text-app
+- **Node.js** v18 or higher  
+- **Rust** (latest stable)  
+- **Tauri prerequisites**  
+  - Windows: Visual Studio C++ Build Tools  
 
-2. Install dependencies:
+---
 
-   npm install
+### Installation Steps
 
-3. Configure API Key:
+#### 1. Clone the Repository
+```bash
+git clone <your-repo-url>
+cd voice-text-app
+2. Install Dependencies
+bash
+Copy code
+npm install
+3. Configure Deepgram API Key
+Create a .env file in the project root:
 
-   Open src/hooks/useVoiceToText.js.
+env
+Copy code
+VITE_DEEPGRAM_API_KEY=your_deepgram_api_key_here
+4. Run the Application (Development Mode)
+bash
+Copy code
+npm run tauri dev
+🧪 Usage Flow
+Click Start Recording
 
-   Replace YOUR_DEEPGRAM_KEY_HERE with your valid Deepgram API Key.
+Speak into the microphone
 
-4. Run the development app:
+Watch live transcription appear in real time
 
-   npm run tauri dev
+Click Stop Recording
 
-⚠️ Known Limitations & Assumptions
-Security: For this demonstration, the API Key is stored client-side. In a production environment, an ephemeral key server or backend proxy would be required to secure credentials.
+Transcription is saved to history
 
-Network: The application assumes a stable internet connection for WebSocket streaming. Offline support is not currently implemented.
-
-Audio Format: The app defaults to audio/webm, which is widely supported by modern browsers and Deepgram.
+Edit the text if required
 
 📄 License
-This project is created for a technical assessment and is available for evaluation purposes.
+This project was created for a technical assessment and is provided for evaluation and demonstration purposes only.
